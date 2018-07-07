@@ -1,0 +1,18 @@
+[Unit]
+Description=My twitter tracking tool.
+After=network.target
+
+[Service]
+Type=simple
+User=<username>
+WorkingDirectory=/home/<username>
+ExecStart=/home/<username>/<executable_name> <flags>
+Restart=on-abort
+
+Environment=TWITTER_CONSUMER_KEY=<your_consumer_key>
+Environment=TWITTER_CONSUMER_SECRET=<your_consumer_secret>
+Environment=TWITTER_ACCESS_TOKEN=<your_access_Token>
+Environment=TWITTER_ACCESS_TOKEN_SECRET=<your_access_Token_secret>
+
+[Install]
+WantedBy=multi-user.target
