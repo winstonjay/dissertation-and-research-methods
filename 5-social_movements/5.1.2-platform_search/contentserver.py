@@ -1,19 +1,18 @@
-
 '''
 cserver.py : A simple interface for qualitive analysis of Twitter and
 YouTube datasets. It combines both a GUI and prints additional
 information to a cli.
 
-usage: cserver.py [-h] [-n LIMIT] file
+usage: contentserver.py [-h] [-n LIMIT] file platform
 
 positional arguments:
   file                  ndjson file to explore
+  platform              youtube or twitter
 
 optional arguments:
   -h, --help            show this help message and exit
   -n LIMIT, --limit LIMIT
                         number of examples to rate.
-
 '''
 from __future__ import print_function
 
@@ -143,12 +142,11 @@ class DataCursor:
             data = [(i, json.loads(line)) for i, line in enumerate(rp)]
         # random.shuffle(data)
         self.data = data[:config.limit]
-        self.pos  = 0
+        self.pos  = config.start
         self.size = len(self.data)
         self.curr = self.data[self.pos]
         self.config = config
         self.fp = fp
-        print(self.fp)
 
     @property
     def done(self):
@@ -157,6 +155,7 @@ class DataCursor:
     def advance(self, score):
         self.write(score)
         if self.pos < self.size:
+            print(f'item: {self.pos}/{self.size}')
             self.pos += 1
             self.curr = self.data[self.pos]
             return True
@@ -192,7 +191,11 @@ class DataCursor:
 
     def visit_page(self):
         _, entry = self.curr
-        webbrowser.open(self.config.get_page(entry))
+        try:
+            webbrowser.open(self.config.get_page(entry))
+        except Exception as e:
+            print('COULD NOT OPEN PAGE.')
+            print(e)
 
 
 def parse_args():
@@ -200,12 +203,13 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str, help='ndjson file to explore')
     parser.add_argument('platform', type=str, help="youtube or twitter")
+    parser.add_argument('-i', '--start', type=int, help="index to start at", default=0)
     parser.add_argument(
         '-n',
         '--limit',
         type=int,
         help='number of examples to rate.',
-        default=50)
+        default=500)
     return parser.parse_args()
 
 def print_value(item, indent=18):
@@ -229,6 +233,7 @@ class Config:
     def __init__(self, args):
         self.fname    = args.file
         self.limit    = args.limit
+        self.start    = args.start
         self.platform = args.platform
         self.ops = platforms.get(args.platform)
         self.ops['fmt'] = self.build_fmt(args.platform)
@@ -273,7 +278,7 @@ platforms = {
         'title': lambda p: p['snippet']['title'],
         'img':   lambda p: p['snippet']['thumbnails']['default']['url'],
         'id':    lambda p: p['id'],
-        'page':  lambda p: 'https://www.youtube.com/user/{}'.format(p['snippet']['customUrl'])
+        'page':  lambda p: 'https://www.youtube.com/channel/{}/videos'.format(p['id'])
     }
 }
 

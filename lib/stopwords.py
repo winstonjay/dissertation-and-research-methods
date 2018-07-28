@@ -1,6 +1,6 @@
 import os
 
-def stopwords(fname='stopwords'):
+def load(fname='stopwords'):
     filepath = os.path.join(path, fname)
     with open(filepath) as fp:
         sw = fp.read()

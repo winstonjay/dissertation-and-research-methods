@@ -26,7 +26,6 @@ def main():
             if r > 3:
                 print(f'{i},{ids[i]},{r}', file=fp)
 
-
 def avg(a): return sum(a) / len(a)
 
 def parse_args():

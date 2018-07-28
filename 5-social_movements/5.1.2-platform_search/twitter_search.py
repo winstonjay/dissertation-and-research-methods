@@ -78,8 +78,11 @@ def search_users(q, limit):
     # Tweepy ref:
     # API.search_users(q[, per_page][, page]) -> list of User objects
     cursor = tweepy.Cursor(api.search_users, q=q)
-    for user in cursor.items(limit):
-        yield user
+    try:
+        for user in cursor.items(limit):
+            yield user
+    except tweepy.error.TweepError as e:
+        print(e)
 
 def user_json(user):
     'convert tweepy User object into a json string'
