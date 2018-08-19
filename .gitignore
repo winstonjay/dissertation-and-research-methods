@@ -1,4 +1,5 @@
 env/
 .env
-data/
+**/data/*
+!**/data/README.md
 misc/
