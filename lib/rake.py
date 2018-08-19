@@ -110,7 +110,7 @@ class CollectionOperator(object):
     #
     # exclusiveness: exc(k) = edf(k) / rdf(k)
     # essentialness: ess(k) = exc(k) * edf(k)
-    # genrality:     gen(k) = rdf(k) * (1.0 - exc(k))qq
+    # genrality:     gen(k) = rdf(k) * (1.0 - exc(k))
     #
     # the paper describes:
     # 'Keywords that are both highly essential and highly general are essential
@@ -139,17 +139,17 @@ class CollectionOperator(object):
             for k in self.extractor.candidates(doc):
                 rdf[k] += 1
         # populate all the feilds for each
-        for k in self.rdf:
+        for k in rdf:
             self._exclusive[k] = edf[k] / rdf[k]
-            self._essential[k] = exc * edf[k]
-            self._general[k]   = rdf[k] * (1.0 - exc)
+            self._essential[k] = self._exclusive[k] * edf[k]
+            self._general[k]   = rdf[k] * (1.0 - self._exclusive[k])
 
     @property
     def exclusive(self):
         'return the most exclusive keywords. exc =  edf / rdf'
         if not self._exclusive:
             raise AttributeError('Collection must be fitted via self.fit()')
-        return self._exlusive
+        return self._exclusive
 
     @property
     def essential(self):
